@@ -5,23 +5,67 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1000円ガチャ（個人用）</title>
 <style>
-  body { font-family: sans-serif; background: #ffffff; padding: 20px; }
-  .btn { padding: 10px 18px; background: #4CAF50; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
-  .btn:disabled { background: #aaa; }
-  #result { margin-top: 20px; padding: 20px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; }
+  body { 
+    font-family: sans-serif; 
+    background: #ffffff; 
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .btn { 
+    padding: 20px 40px;
+    background: #4CAF50; 
+    color: #fff; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 10px 5px;
+    transition: background 0.3s;
+  }
+  .btn:hover:not(:disabled) {
+    background: #45a049;
+  }
+  .btn:disabled { 
+    background: #aaa;
+    cursor: not-allowed;
+  }
+  #gachaBtn {
+    font-size: 24px;
+    padding: 30px 60px;
+  }
+  #result { 
+    margin-top: 20px; 
+    padding: 20px; 
+    border: 1px solid #ddd; 
+    border-radius: 10px; 
+    background: #fafafa;
+    font-size: 16px;
+  }
+  h2 {
+    color: #333;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+  li {
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+  }
 </style>
 </head>
 
 <body>
 
-<h2>1000円ガチャ（個人用）</h2>
+<h2>🍝 サイゼリヤ1000円ガチャ（個人用）</h2>
 
 <p>※データは固定のスプレッドシート（CSV）から読み込みます。</p>
 
-<button id="loadBtn" class="btn">データを読み込む</button>
-<button id="gachaBtn" class="btn" disabled>ガチャを回す</button>
+<button id="gachaBtn" class="btn" disabled>🎰 ガチャを回す</button>
 
-<div id="result">データ未読込み</div>
+<div id="result">📥 データ読み込み中...</div>
 
 
 <script>
@@ -37,40 +81,22 @@ function loadCSV() {
     fetch(FIXED_CSV_URL)
     .then(res => res.text())
     .then(text => {
-        const lines = text.trim().split("\n");
-        
-        // ★デバッグ：ヘッダーと最初のデータ行を確認
-        console.log("ヘッダー:", lines[0]);
-        console.log("1行目データ:", lines[1]);
-        
-        items = lines.slice(1).map(line => {
-            const cols = line.split(",");
-            
-            // ★デバッグ：分割結果を確認
-            console.log("分割結果:", cols);
-            
-            const [id, product_no, name, price, category] = cols;
-            
-            const item = { 
+        items = text.trim().split("\n").slice(1).map(line => {
+            const [id, product_no, name, price, category] = line.split(",");
+            return { 
                 id: id?.trim() || "",
                 product_no: product_no?.trim() || "",
                 name: name?.trim() || "", 
                 price: Number(price?.trim()) || 0, 
                 category: category?.trim() || ""
             };
-            
-            // ★デバッグ：作成されたアイテム
-            console.log("アイテム:", item);
-            
-            return item;
         });
 
-        console.log("全アイテム:", items);
-        document.getElementById("result").innerHTML = `データ読み込み完了！(${items.length}件)`;
+        document.getElementById("result").innerHTML = `✅ データ読み込み完了！(${items.length}件)`;
         document.getElementById("gachaBtn").disabled = false;
     })
     .catch(err => {
-        document.getElementById("result").innerHTML = "読み込みエラー：URLを確認してください";
+        document.getElementById("result").innerHTML = "❌ 読み込みエラー：URLを確認してください";
         console.error(err);
     });
 }
@@ -117,19 +143,19 @@ function runGacha() {
 
     if (!combo) {
         document.getElementById("result").innerHTML = 
-            "1000円ぴったりになる組み合わせが見つかりませんでした。<br>（メニューを見直してください）";
+            "❌ 1000円ぴったりになる組み合わせが見つかりませんでした。<br>（メニューを見直してください）";
         return;
     }
 
-    let html = "<h3>ガチャ結果（1000円ぴったり）</h3><ul>";
+    let html = "<h3>🎉 ガチャ結果（1000円ぴったり）</h3><ul>";
+    let total = 0;
 
     combo.forEach(item => {
-        // ★デバッグ出力
-        console.log("表示アイテム:", item);
-        html += `<li>${item.product_no} ${item.name} ${item.price}円</li>`;
+        html += `<li><strong>${item.product_no}</strong> ${item.name} <span style="color: #d32f2f;">${item.price}円</span></li>`;
+        total += item.price;
     });
 
-    html += "</ul>";
+    html += `</ul><p style="font-size: 20px; font-weight: bold; color: #4CAF50;">合計: ${total}円</p>`;
 
     document.getElementById("result").innerHTML = html;
 }
