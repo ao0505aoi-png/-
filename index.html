@@ -121,7 +121,7 @@ function runGacha() {
     let html = "<h3>ガチャ結果（1000円ぴったり）</h3><ul>";
 
     combo.forEach(item => {
-        html += `<li>${item.name}（${item.price}円） / 商品番号：${item.code}</li>`;
+        html += `<li>${item.code} ${item.name} ${item.price}円</li>`;
     });
 
     html += "</ul>";
